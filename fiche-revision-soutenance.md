@@ -132,7 +132,49 @@ l'expliquer. »
 
 ---
 
-## 7. Checklist avant d'entrer
+## 7. Boutons, clics & automatismes — qui, quoi, **où dans le code**
+
+> Style « là j'ai fait un bind pour… ». Pour chaque élément : **qui** l'explique + le **fichier · fonction**.
+
+### Les vrais boutons
+
+| Bouton | Qui | Où (UI + logique) |
+|---|---|---|
+| **Commencer la partie** | Moi | UI [choosePlayers.fxml:39](src/main/resources/fxml/choosePlayers.fxml#L39) → [ChoosePlayersView.java:85](src/main/java/fr/umontpellier/iut/dominionfx/views/ChoosePlayersView.java#L85) `setPlayersNamesList()` ; lancement par le listener [DominionIHM.java:224](src/main/java/fr/umontpellier/iut/dominionfx/DominionIHM.java#L224) |
+| **Passer** | Moi | UI [currentPlayer.fxml:64](src/main/resources/fxml/currentPlayer.fxml#L64) → [CurrentPlayerView.java:251](src/main/java/fr/umontpellier/iut/dominionfx/views/CurrentPlayerView.java#L251) `onSkip()` → `game.skipWasChosen()` |
+| **Jouer les trésors** | Moi | UI [currentPlayer.fxml:66](src/main/resources/fxml/currentPlayer.fxml#L66) → [CurrentPlayerView.java:257](src/main/java/fr/umontpellier/iut/dominionfx/views/CurrentPlayerView.java#L257) `onPlayTreasures()` |
+| **Oui / Non** | Moi | UI [currentPlayer.fxml:68](src/main/resources/fxml/currentPlayer.fxml#L68) → [CurrentPlayerView.java:263](src/main/java/fr/umontpellier/iut/dominionfx/views/CurrentPlayerView.java#L263) `onYes()`/`onNo()` ; zone désactivée par bind [CurrentPlayerView.java:160](src/main/java/fr/umontpellier/iut/dominionfx/views/CurrentPlayerView.java#L160) |
+
+### Les clics sur les cartes (zones cliquables, pas des boutons)
+
+| Clic | Qui | Où |
+|---|---|---|
+| Carte **de la main** → jouer | Moi | [CurrentPlayerView.java:241](src/main/java/fr/umontpellier/iut/dominionfx/views/CurrentPlayerView.java#L241) `createCardPlaceholder()` |
+| Pile de la **réserve** → acheter | Zakaria | [GameView.java:164](src/main/java/fr/umontpellier/iut/dominionfx/views/GameView.java#L164) `createSupplyPileView()` |
+| Survol → **zoom** | Zakaria | [CardView.java:167](src/main/java/fr/umontpellier/iut/dominionfx/views/CardView.java#L167) `buildTransition()` |
+| Survol **3 s → plein écran** + clic pour fermer | Moi | minuteur [CardView.java:103](src/main/java/fr/umontpellier/iut/dominionfx/views/CardView.java#L103) ; [CardView.java:113](src/main/java/fr/umontpellier/iut/dominionfx/views/CardView.java#L113) `showFullScreen()` / [CardView.java:151](src/main/java/fr/umontpellier/iut/dominionfx/views/CardView.java#L151) `hideFullScreen()` |
+
+### Les petits automatismes (bind / listener, sans bouton)
+
+| Automatisme | Qui | Où |
+|---|---|---|
+| Texte d'**instruction** (bind) | Moi | [GameView.java:118](src/main/java/fr/umontpellier/iut/dominionfx/views/GameView.java#L118) `createBindings()` |
+| Zone **cartes temporaires** (bind visible/managed) | Moi | [GameView.java:120](src/main/java/fr/umontpellier/iut/dominionfx/views/GameView.java#L120) `createBindings()` |
+| **Compteurs** actions/achats/argent/pioche/défausse (bind) | Moi | [CurrentPlayerView.java:154](src/main/java/fr/umontpellier/iut/dominionfx/views/CurrentPlayerView.java#L154) `bindToPlayer()` |
+| **Points de victoire** (listener + recalcul) | Moi | [CurrentPlayerView.java:179](src/main/java/fr/umontpellier/iut/dominionfx/views/CurrentPlayerView.java#L179) `refreshVictoryPoints()` |
+| **Journal** des actions (listener + scroll) | Moi | [GameView.java:80](src/main/java/fr/umontpellier/iut/dominionfx/views/GameView.java#L80) `setupActionLog()` / [:97](src/main/java/fr/umontpellier/iut/dominionfx/views/GameView.java#L97) `watchPlays()` |
+| **Tapis masqués** quand vides (visible+managed) | Moi | [CurrentPlayerView.java:194](src/main/java/fr/umontpellier/iut/dominionfx/views/CurrentPlayerView.java#L194) `refreshIslandMat()` / [:212](src/main/java/fr/umontpellier/iut/dominionfx/views/CurrentPlayerView.java#L212) `setBlockVisible()` |
+| **Badge nombre** + pile grisée (bind) | Zakaria | [GameView.java:156](src/main/java/fr/umontpellier/iut/dominionfx/views/GameView.java#L156) `createSupplyPileView()` |
+| **Chronomètre** (Timeline 1 s) | Zakaria | [CurrentPlayerView.java:106](src/main/java/fr/umontpellier/iut/dominionfx/views/CurrentPlayerView.java#L106) `startTimer()` |
+| Fenêtre **maximisée** + ScrollPane responsive | Moi | [DominionIHM.java:83](src/main/java/fr/umontpellier/iut/dominionfx/DominionIHM.java#L83) `startGame()` |
+
+> **Astuce mémoire :** mes boutons/clics sont dans `CurrentPlayerView` (+ `ChoosePlayersView`), mes
+> binds d'affichage dans `GameView.createBindings` et `CurrentPlayerView.bindToPlayer`. Tout ce qui
+> touche la **réserve** (`GameView.createSupplyPileView`) et le **chrono** est à Zakaria.
+
+---
+
+## 8. Checklist avant d'entrer
 
 - [ ] Le projet **compile et se lance** (tester un lancement complet juste avant).
 - [ ] Le **dernier commit** est bien celui attendu (sinon `git checkout` dessus).
@@ -141,4 +183,3 @@ l'expliquer. »
 - [ ] Je sais expliquer **bind vs listener** (§2) sans hésiter.
 - [ ] Je sais quoi répondre sur **les autres joueurs** (§4).
 - [ ] Je connais ma **frontière** avec Zakaria (§6).
-```
